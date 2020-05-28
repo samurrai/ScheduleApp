@@ -83,6 +83,7 @@
     </ApplicationDefinition>
     <Compile Include="Cabinets.cs" />
     <Compile Include="Classes.cs" />
+    <Compile Include="CustomSchedule.cs" />
     <Compile Include="TableForm.xaml.cs">
       <DependentUpon>TableForm.xaml</DependentUpon>
     </Compile>
@@ -90,6 +91,7 @@
     <Compile Include="Lessons.cs" />
     <Compile Include="Schedule.cs" />
     <Compile Include="ScheduleContext.cs" />
+    <Compile Include="TeacherCabinet.cs" />
     <Compile Include="Teachers.cs" />
     <Page Include="TableForm.xaml">
       <SubType>Designer</SubType>
@@ -137,11 +139,11 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Schedule.mdf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Schedule_log.ldf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <DependentUpon>Schedule.mdf</DependentUpon>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>

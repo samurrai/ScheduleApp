@@ -100,7 +100,7 @@ namespace ScheduleApp
 
             foreach (var obj in context.Classes)
             {
-                if (obj.Name == (string)dayCB.SelectedValue)
+                if (obj.Name == (string)classCB.SelectedValue)
                 {
                     id = obj.Id;
                 }

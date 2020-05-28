@@ -32,18 +32,34 @@ namespace ScheduleApp
         List<Teachers> teachers;
         List<Cabinets> cabinets;
 
+        List<CustomSchedule> customSchedules;
+        List<TeacherCabinet> teacherCabinets;
+
         public TableForm(List<Schedule> list, ScheduleContext context)
         {
             InitializeComponent();
 
             schedules = list;
 
-            dataGrid.Columns.Add(new DataGridTextColumn { Header="ID", Binding = new Binding("Id") });
-            dataGrid.Columns.Add(new DataGridTextColumn { Header="ID предмета", Binding = new Binding("LessonId") });
-            dataGrid.Columns.Add(new DataGridTextColumn { Header="ID класса", Binding = new Binding("ClassId") });
-            dataGrid.Columns.Add(new DataGridTextColumn { Header="ID дня недели", Binding = new Binding("DayOfWeekId") });
+            customSchedules = new List<CustomSchedule>();
 
-            dataGrid.ItemsSource = schedules;
+            foreach (var item in schedules)
+            {
+                CustomSchedule customSchedule = new CustomSchedule();
+                customSchedule.Id = item.Id;
+                customSchedule.DayOfWeek = item.DaysOfWeek.Name;
+                customSchedule.Lesson = item.Lessons.Lesson;
+                customSchedule.Class = item.Classes.Name;
+
+                customSchedules.Add(customSchedule);
+            }
+
+            dataGrid.Columns.Add(new DataGridTextColumn { Header="ID", Binding = new Binding("Id") });
+            dataGrid.Columns.Add(new DataGridTextColumn { Header="Предмет", Binding = new Binding("Lesson") });
+            dataGrid.Columns.Add(new DataGridTextColumn { Header="Класс", Binding = new Binding("Class") });
+            dataGrid.Columns.Add(new DataGridTextColumn { Header="День недели", Binding = new Binding("DayOfWeek") });
+
+            dataGrid.ItemsSource = customSchedules;
 
             dataGrid.SelectedIndex = 0;
 
@@ -60,11 +76,29 @@ namespace ScheduleApp
 
             teachers = list;
 
-            dataGrid.Columns.Add(new DataGridTextColumn { Header = "ID", Binding = new Binding("Id") });
-            dataGrid.Columns.Add(new DataGridTextColumn { Header = "Имя учителя", Binding = new Binding("Name") });
-            dataGrid.Columns.Add(new DataGridTextColumn { Header = "ID кабинета", Binding = new Binding("CabinetId") });
+            teacherCabinets = new List<TeacherCabinet>();
 
-            dataGrid.ItemsSource = teachers;
+            foreach (var item in teachers)
+            {
+                teacherCabinets.Add(new TeacherCabinet {
+                    Id = item.Id,
+                    Teacher = item.Name,
+                    Cabinet = item.Cabinets.Number
+                });
+            }
+
+            cabinets = new List<Cabinets>();
+
+            foreach (var cabinet in context.Cabinets)
+            {
+                cabinets.Add(cabinet);
+            }
+
+            dataGrid.Columns.Add(new DataGridTextColumn { Header = "Id учителя", Binding = new Binding("Id") });
+            dataGrid.Columns.Add(new DataGridTextColumn { Header = "Имя учителя", Binding = new Binding("Teacher") });
+            dataGrid.Columns.Add(new DataGridTextColumn { Header = "Номер кабинета", Binding = new Binding("Cabinet") });
+
+            dataGrid.ItemsSource = teacherCabinets;
 
             dataGrid.SelectedIndex = 0;
 
@@ -112,46 +146,126 @@ namespace ScheduleApp
         {
             if (current == 0)
             {
-                Schedule schedule = new Schedule
+                try
                 {
-                    Id = int.Parse(id.Text),
-                    ClassId = int.Parse(classId.Text),
-                    LessonId = int.Parse(lessonId.Text),
-                    DayOfWeekId = int.Parse(dayId.Text)
-                };
-                schedules.Add(schedule);
+                    Schedule schedule = new Schedule
+                    {
+                        Id = int.Parse(id.Text),
+                        ClassId = int.Parse(classId.Text),
+                        LessonId = int.Parse(lessonId.Text),
+                        DayOfWeekId = int.Parse(dayId.Text)
+                    };
 
-                dataGrid.ItemsSource = schedules;
-                dataGrid.Items.Refresh();
-                MessageBox.Show("Объект с id " + schedule.Id + " был добавлен");
+                    context.Schedule.Add(schedule);
+                    context.SaveChanges();
+
+                    schedules.Add(schedule);
+
+                    CustomSchedule customSchedule = new CustomSchedule();
+                    customSchedule.Id = schedule.Id;
+
+                    foreach (var item in context.Classes)
+                    {
+                        if (item.Id == schedule.ClassId)
+                        {
+                            customSchedule.Class = item.Name;
+                            break;
+                        }
+                    }
+
+                    foreach (var item in context.DaysOfWeek)
+                    {
+                        if (item.Id == schedule.DayOfWeekId)
+                        {
+                            customSchedule.DayOfWeek = item.Name;
+                            break;
+                        }
+                    }
+
+                    foreach (var item in context.Lessons)
+                    {
+                        if (item.Id == schedule.LessonId)
+                        {
+                            customSchedule.Lesson = item.Lesson;
+                            break;
+                        }
+                    }
+
+                    customSchedules.Add(customSchedule);
+
+                    dataGrid.ItemsSource = customSchedules;
+                    dataGrid.Items.Refresh();
+
+                    MessageBox.Show("Объект с id " + schedule.Id + " был добавлен");
+                }
+                catch(Exception)
+                {
+                    MessageBox.Show("При добавлении записи произошла ошибка, проверьте правильность вводимых данных(возможно указан неправильный ID)");
+                }
             }
             else if (current == 1)
             {
-                Teachers teacher = new Teachers
+                try
                 {
-                    Id = int.Parse(id.Text),
-                    Name = classId.Text,
-                    CabinetId = int.Parse(lessonId.Text),
-                };
-                teachers.Add(teacher);
+                    Teachers teacher = new Teachers
+                    {
+                        Id = int.Parse(id.Text),
+                        Name = classId.Text,
+                        CabinetId = int.Parse(lessonId.Text),
+                    };
 
-                dataGrid.ItemsSource = teachers;
-                dataGrid.Items.Refresh();
-                MessageBox.Show("Объект с id " + teacher.Id + " был добавлен");
+                    context.Teachers.Add(teacher);
+                    context.SaveChanges();
+
+                    teachers.Add(teacher);
+
+
+                    TeacherCabinet teacherCabinet = new TeacherCabinet();
+                    teacherCabinet.Id = teacher.Id;
+                    teacherCabinet.Teacher = teacher.Name;
+
+                    foreach (var item in cabinets)
+                    {
+                        if (item.Id == teacher.CabinetId)
+                        {
+                            teacherCabinet.Cabinet = item.Number;
+                            break;
+                        }
+                    }
+
+                    teacherCabinets.Add(teacherCabinet);
+
+                    dataGrid.ItemsSource = teacherCabinets;
+                    dataGrid.Items.Refresh();
+                    MessageBox.Show("Объект с id " + teacher.Id + " был добавлен");
+                }
+                catch(Exception)
+                {
+                    MessageBox.Show("При добавлении записи произошла ошибка, проверьте правильность вводимых данных(возможно указан неправильный ID)");
+                }
             }
             else
             {
-                Cabinets cabinet = new Cabinets
+                try
                 {
-                    Id = int.Parse(id.Text),
-                    Number = int.Parse(classId.Text)
-                };
-                cabinets.Add(cabinet);
+                    Cabinets cabinet = new Cabinets
+                    {
+                        Id = int.Parse(id.Text),
+                        Number = int.Parse(classId.Text)
+                    };
+                    cabinets.Add(cabinet);
 
-                dataGrid.ItemsSource = cabinets;
-                dataGrid.Items.Refresh();
-                MessageBox.Show("Объект с id " + cabinet.Id + " был добавлен");
+                    context.Cabinets.Add(cabinet);
+                    context.SaveChanges();
 
+                    dataGrid.ItemsSource = cabinets;
+                    dataGrid.Items.Refresh();
+                    MessageBox.Show("Объект с id " + cabinet.Id + " был добавлен");
+                }
+                catch(Exception)
+                {
+                    MessageBox.Show("При добавлении записи произошла ошибка, проверьте правильность вводимых данных(возможно указан неправильный ID)");
+                }
             }
         }
 
@@ -163,29 +277,44 @@ namespace ScheduleApp
 
                 if (current == 0)
                 {
-                    foreach(var item in schedules)
+                    foreach(var item in customSchedules)
                     {
-                        if (item.Id == (dataGrid.SelectedItem as Schedule).Id)
+                        if (item.Id == (dataGrid.SelectedItem as CustomSchedule).Id)
                         {
                             id = item.Id;
-                            schedules.Remove(item);
+                            customSchedules.Remove(item);
+                            foreach (var schedule in context.Schedule)
+                            {
+                                if (schedule.Id == id)
+                                {
+                                    context.Schedule.Remove(schedule);
+                                    break;
+                                }
+                            }
                             break;
                         }
                     }
-                    dataGrid.ItemsSource = schedules;
+                    dataGrid.ItemsSource = customSchedules;
                 }
                 else if (current == 1)
                 {
-                    foreach (var item in teachers)
+                    foreach (var item in teacherCabinets)
                     {
-                        if (item.Id == (dataGrid.SelectedItem as Teachers).Id)
+                        if (item.Id == (dataGrid.SelectedItem as TeacherCabinet).Id)
                         {
                             id = item.Id;
-                            teachers.Remove(item);
+                            teacherCabinets.Remove(item);
+                            foreach (var teacher in context.Teachers)
+                            {
+                                if (teacher.Id == id)
+                                {
+                                    context.Teachers.Remove(teacher);
+                                }
+                            }
                             break;
                         }
                     }
-                    dataGrid.ItemsSource = teachers;
+                    dataGrid.ItemsSource = teacherCabinets;
                 }
                 else
                 {
@@ -195,12 +324,20 @@ namespace ScheduleApp
                         {
                             id = item.Id;
                             cabinets.Remove(item);
+                            foreach (var cabinet in context.Cabinets)
+                            {
+                                if (cabinet.Id == id)
+                                {
+                                    context.Cabinets.Remove(cabinet);
+                                }
+                            }
                             break;
                         }
                     }
                     dataGrid.ItemsSource = cabinets;
                 }
 
+                context.SaveChanges();
                 dataGrid.Items.Refresh();
                 MessageBox.Show("Объект с id " + id + " был удален");
             }
@@ -215,8 +352,8 @@ namespace ScheduleApp
             PrintDocument printDocument = new PrintDocument();
             printDocument.PrintPage += PrintPageHandler;
 
-            foreach(var item in schedules)
-                result += $"ID - {item.Id}, ID предмета - {item.LessonId}, ID класса - {item.ClassId}, ID дня недели - {item.DayOfWeekId}\n";
+            foreach(var item in customSchedules)
+                result += $"ID - {item.Id}, ID предмета - {item.Lesson}, ID класса - {item.Class}, ID дня недели - {item.DayOfWeek}\n";
             
 
             PrintDialog printDialog = new PrintDialog();

@@ -1,5 +1,3 @@
-C:\Users\User\source\repos\ScheduleApp\ScheduleApp\bin\Debug\Schedule.mdf
-C:\Users\User\source\repos\ScheduleApp\ScheduleApp\bin\Debug\Schedule_log.ldf
 C:\Users\User\source\repos\ScheduleApp\ScheduleApp\bin\Debug\ScheduleApp.exe.config
 C:\Users\User\source\repos\ScheduleApp\ScheduleApp\bin\Debug\ScheduleApp.exe
 C:\Users\User\source\repos\ScheduleApp\ScheduleApp\bin\Debug\ScheduleApp.pdb
@@ -21,6 +19,7 @@ C:\Users\User\source\repos\ScheduleApp\ScheduleApp\obj\Debug\ScheduleApp.csproj.
 C:\Users\User\source\repos\ScheduleApp\ScheduleApp\obj\Debug\ScheduleApp.csproj.CopyComplete
 C:\Users\User\source\repos\ScheduleApp\ScheduleApp\obj\Debug\ScheduleApp.exe
 C:\Users\User\source\repos\ScheduleApp\ScheduleApp\obj\Debug\ScheduleApp.pdb
-C:\Users\User\source\repos\ScheduleApp\ScheduleApp\obj\Debug\ScheduleApp.csprojAssemblyReference.cache
 C:\Users\User\source\repos\ScheduleApp\ScheduleApp\obj\Debug\TableForm.g.cs
 C:\Users\User\source\repos\ScheduleApp\ScheduleApp\obj\Debug\TableForm.baml
+C:\Users\User\source\repos\ScheduleApp\ScheduleApp\bin\Debug\Schedule.mdf
+C:\Users\User\source\repos\ScheduleApp\ScheduleApp\bin\Debug\Schedule_log.ldf
